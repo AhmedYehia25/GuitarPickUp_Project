@@ -57,281 +57,33 @@
 
 <!--------------------------Home section ----------------------------------->
 
-<div class="intro-section" id="programs-section">
-    <div class="slide-1" style="background-image: url('static/images/main.jpeg');" data-stellar-background-ratio="0.5">
-        <h1 data-aos="fade-up" data-aos-delay="100" class="text-center" style="position: absolute; text-align: center; width:100%; top:20%">Exercise 1</h1>
-
+<div class="intro-section" id="programs-section" style="width:100%; background-color: white; overflow-x: hidden; overflow-y: hidden;">
+    <div class="slide-1">
         <div class="container">
 
-            <div class="row align-items-center">
-                
-                <div class="col-6"><video width="450" height="350" controls style="object-fit: fill;"><source src="/static/images/video1.mp4" type="video/mp4"></video></div>
-                <div class="col-6">
-                    <div class="container">
-                        <video class="input_video" style="display:none"></video>
-                        <canvas class="output_canvas" width="450" height="350"></canvas>
-                      </div>
-                </div>
+            
+            <div style=" position: absolute;left: 12%;top: 20%;min-width:100%;min-height:100%;">
+                <div class="container">
+                    <video class="input_video" style="display:none"></video>
+                    <canvas class="output_canvas" width="600" height="400"></canvas>
+                  </div>
+
+            </div>
+            <div style="  position: absolute;left: 25%;top: 20%;min-width:100%;min-height:100%;">
+            
+                <video id="video-demo" width="800" height="600" controls style="object-fit: fill;">
+                    <source src="/static/images/video1.mp4" type="video/mp4">
+                    Your browser does not support HTML5 video.
+                </video>
             
             </div>
             
-            <script type="module">
-                
-                document.getElementById("start-record").style.display="none";
-                document.getElementById("end-record").style.display="none";
-                document.getElementById("submit").style.display="none";
-                document.getElementById("feedback_table").style.display="none";
-                let video = document.querySelector("#video");
-                let start_camera = document.querySelector("#start-camera");
-                let start_button = document.querySelector("#start-record");
-                let stop_button = document.querySelector("#end-record");
-                let download_link = document.querySelector("#download-video");
-
-                let camera_stream = null;
-                let media_recorder = null;
-                let blobs_recorded = [];
-                
-                const videoElement = document.getElementsByClassName('input_video')[0];
-                const canvasElement = document.getElementsByClassName('output_canvas')[0];
-                const canvasCtx = canvasElement.getContext('2d');
-                var indexFinger = document.getElementById("index");
-                var middleFinger = document.getElementById("middle");
-                var ringFinger = document.getElementById("ring");
-                var pinkyFinger = document.getElementById("pinky");
-                function onResults(results) {
-                  canvasCtx.save();
-                  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                  canvasCtx.drawImage(
-                      results.image, 0, 0, canvasElement.width, canvasElement.height);
-                  if (results.multiHandLandmarks) {
-                      var left_hand;
-                      var right_hand;
-                      for (var i = 0; i < 2; i++) {
-                          if (results.multiHandedness[i]) {
-                            if (results.multiHandedness[i]['label'] == "Left") {
-                                left_hand = results.multiHandLandmarks[i];
-                            } else if (results.multiHandedness[i]['label'] == "Right"){
-                                right_hand = results.multiHandLandmarks[i];
-                            }
-                        }
-                      }
-
-                    // identify an element to observe
-                    let elementToObserve = document.getElementById('noteID');
-                    
-                    // create a new instance of 'MutationObserver' named 'observer', 
-                    // passing it a callback function
-                    let note_changed = document.getElementById('noteID').innerHTML;   
-                    let observer = new MutationObserver(function (mutationsList, observer) {
-                        //console.log(mutationsList);
-                        //console.log(note_changed);
-                        //console.log(document.getElementById('noteID').innerHTML)
-                        //console.log(note_changed != document.getElementById('noteID').innerHTML);
-                        if(note_changed != document.getElementById('noteID').innerHTML)
-                        {
-                            note_changed = document.getElementById('noteID').innerHTML;
-                            let index_class = document.getElementById('index').innerHTML;
-                            let middle_class = document.getElementById('middle').innerHTML;
-                            let ring_class = document.getElementById('ring').innerHTML;
-                            let pinky_class = document.getElementById('pinky').innerHTML;
-                            console.log('noticable change');
-                            //console.log(note_changed);
-                            $.ajax({
-                                url: '/record_feedback',
-                                data: {
-                                    'index_class': index_class,
-                                    'middle_class':middle_class,
-                                    'ring_class':ring_class,
-                                    'pinky_class':pinky_class,
-                                    'note_played': note_changed,
-
-                                },
-                                dataType: 'json',
-                                success: function (data) {
-                                    console.log('success');
-
-                                }
-                            });
-                            //save classes and note 
-                        }
-                        
-                        
-                        
-                    });
-
-                    // call 'observe' on that MutationObserver instance, 
-                    // passing it the element to observe, and the options object
-                    observer.observe(elementToObserve, { characterData: true, childList: true, attributes: false });
-
-                    $.ajax({
-                        url: '/validate_hands',
-                        data: {
-                            'right_hand': JSON.stringify(right_hand),
-                        },
-                        dataType: 'json',
-                        success: function (data) {
-                            //console.log(data);
-                            if (data["index"]) {
-                                $('#index').text(data['index']);
-                                $('#ring').text(data['ring']);
-                                $('#middle').text(data['middle']);
-                                $('#pinky').text(data['pinky']);
-                                //console.log(data);
-                                //$('#note').text(data['note']);
-                            }
-                        }
-                    });
-                    for (const landmarks of results.multiHandLandmarks) {
-                      drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
-                                     {color: '#00FF00', lineWidth: 5});
-                      drawLandmarks(canvasCtx, landmarks, {color: '#FF0000', lineWidth: 2});
-                    }
-                  }
-                  canvasCtx.restore();
-                }
-                
-                const hands = new Hands({locateFile: (file) => {
-                  return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-                }});
-                hands.setOptions({
-                  maxNumHands: 2,
-                  modelComplexity: 1,
-                  minDetectionConfidence: 0.5,
-                  minTrackingConfidence: 0.5
-                });
-                hands.onResults(onResults);
-
-                start_camera.addEventListener('click', async function() {
-                    document.getElementById("start-camera").style.display="none";
-                    document.getElementById("start-record").style.display="";
-                    document.getElementById("end-record").style.display="";
-                    const camera = new Camera(videoElement, {
-                    onFrame: async () => {
-                        await hands.send({image: videoElement});
-                        },
-                        width: 450,
-                        height: 350
-                    });
-                    camera.start();
-                    camera_stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-	                video.srcObject = camera_stream;
-                });
-                
-
-                start_button.addEventListener('click', function() {
-                    var input = this;
-                    input.disabled = true;
-                    document.getElementById("feedback_table").style.display="";
-                // set MIME type of recording as video/webm
-                media_recorder = new MediaRecorder(camera_stream, { mimeType: "video/webm; codecs=vp8" });
-
-                // event : new recorded video blob available 
-                media_recorder.addEventListener('dataavailable', function(e) {
-                    blobs_recorded.push(e.data);
-                });
-
-                // event : recording stopped & all blobs sent
-                media_recorder.addEventListener('stop', function() {
-                    // create local object URL from the recorded video blobs
-                    let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: "video/webm; codecs=vp8" }));
-                    download_link.href = video_local;
-                });
-
-                // start recording with each recorded blob having 1 second video
-                media_recorder.start(1000);
-                });
-
-                stop_button.addEventListener('click', function() {
-                    var input = this;
-                    input.disabled = true;
-                    document.getElementById("start-record").style.display="none";
-                    document.getElementById("end-record").style.display="none";
-                    document.getElementById("feedback_table").style.display="none";
-                    document.getElementById("submit").style.display="";
-                    media_recorder.stop(); 
-                    onResults.stop();
-
-                });
-                
-                $("#submit").on("click", function (event) {
-                    event.preventDefault();
-                    let btn = $(this);
-                    //   change the button text and disable it
-                    btn.html("Submitting...").prop("disabled", true).addClass("disable-btn");
-                    //   create a new File with the recordedData and its name
-                    const savingblob = new Blob(blobs_recorded , {type: "video/webm; codecs=vp8"});
-                    const recordedFile = new File( [ savingblob ], "test.webm", { type: "video/webm; codecs=vp8"} );
-                    //   initializes an empty FormData
-                    let data = new FormData();
-                    //   appends the recorded file and language value
-                    data.append("excercise_video", recordedFile);
-                    //   post url endpoint
-                    const url = "";
-                    $.ajax({
-                        url: '/record',
-                        method: "POST",
-                        data: data,
-                        dataType: "json",
-                        success: function (response) {
-                        if (response.success) {
-                            document.getElementById("alert").style.display = "block";
-                            window.location.href = `${response.url}`;
-                        } else {
-                            btn.html("Error").prop("disabled", false);
-                        }
-                        },
-                        error: function (error) {
-                        console.error(error);
-                        },
-                        cache: false,
-                        processData: false,
-                        contentType: false,
-                    });
-                });
-
-                // using jQuery
-                function getCookie(name) {
-                    var cookieValue = null;
-                    if (document.cookie && document.cookie !== '') {
-                        var cookies = document.cookie.split(';');
-                        for (var i = 0; i < cookies.length; i++) {
-                            var cookie = jQuery.trim(cookies[i]);
-                            // Does this cookie string begin with the name we want?
-                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                break;
-                            }
-                        }
-                    }
-                    return cookieValue;
-                }
-                var csrftoken = getCookie('csrftoken');
-
-                //Now use it on ajax 
-                function csrfSafeMethod(method) {
-                    // these HTTP methods do not require CSRF protection
-                    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-                }
-                $.ajaxSetup({
-                    beforeSend: function(xhr, settings) {
-                        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                        }
-                    }
-                });
-                    
-                </script>
+            
         </div>
+        <div style="position:absolute; text-align: center; width:100%; bottom:25%; left:-4%"><button id="start-camera" class="btn btn-primary py-3 px-5 btn-pill exercise">Open camera</button></div>
+        <button id="start-record" class="btn btn-primary py-3 px-5 btn-pill exercise" style="position:absolute; text-align: center; width:300px; bottom:25%; left:20%">Start Excercise</button>
+        <button id="end-record" class="btn btn-primary py-3 px-5 btn-pill exercise" style="position:absolute; text-align: center; width:300px; bottom:25%; left:65%">End Excercise</button>
 
-        <div style="position:absolute; text-align: center; width:100%; bottom:25%"><button id="start-camera" class="btn btn-primary py-3 px-5 btn-pill exercise">Open camera</button></div>
-        <div class="row">
-            <div class="col-md-3">
-                <div style="position: absolute; text-align: center; width:100%; bottom:25%;margin-bottom: 45%;margin-left: 60%;"><button id="start-record" class="btn btn-primary py-3 px-5 btn-pill exercise">Start Excercise</button></div>
-            </div>
-            <div class="col-md-3">
-                <div style="position: absolute; text-align: center; width:100%; bottom:25%;margin-bottom: 45%;margin-left: 115%;"><button id="end-record" class="btn btn-primary py-3 px-5 btn-pill exercise">End Excercise</button></div>
-            </div>
-        </div>
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="field">
@@ -370,6 +122,279 @@
 <script src="/static/js/meter.js"></script>
 <script src="/static/js/notes.js"></script>
 <script src="/static/js/app.js"></script>
+
+<script type="module">
+    document.getElementById("start-record").style.display = "none";
+    document.getElementById("end-record").style.display = "none";
+    document.getElementById("submit").style.display = "none";
+    document.getElementById("feedback_table").style.display = "none";
+    let video = document.querySelector("#video");
+    let start_camera = document.querySelector("#start-camera");
+    let start_button = document.querySelector("#start-record");
+    let stop_button = document.querySelector("#end-record");
+    let download_link = document.querySelector("#download-video");
+
+    let camera_stream = null;
+    let media_recorder = null;
+    let blobs_recorded = [];
+    let note_positions = [];
+    const videoElement = document.getElementsByClassName('input_video')[0];
+    const canvasElement = document.getElementsByClassName('output_canvas')[0];
+    const canvasCtx = canvasElement.getContext('2d');
+    var indexFinger = document.getElementById("index");
+    var middleFinger = document.getElementById("middle");
+    var ringFinger = document.getElementById("ring");
+    var pinkyFinger = document.getElementById("pinky");
+    function onResults(results) {
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(
+            results.image, 0, 0, canvasElement.width, canvasElement.height);
+        if (results.multiHandLandmarks) {
+            var left_hand;
+            var right_hand;
+            for (var i = 0; i < 2; i++) {
+                if (results.multiHandedness[i]) {
+                    if (results.multiHandedness[i]['label'] == "Left") {
+                        left_hand = results.multiHandLandmarks[i];
+                    } else if (results.multiHandedness[i]['label'] == "Right") {
+                        right_hand = results.multiHandLandmarks[i];
+                    }
+                }
+            }
+
+            // identify an element to observe
+            let elementToObserve = document.getElementById('noteID');
+
+            // create a new instance of 'MutationObserver' named 'observer', 
+            // passing it a callback function
+            let note_changed = document.getElementById('noteID').innerHTML;
+            let observer = new MutationObserver(function (mutationsList, observer) {
+                //console.log(mutationsList);
+                //console.log(note_changed);
+                //console.log(document.getElementById('noteID').innerHTML)
+                //console.log(note_changed != document.getElementById('noteID').innerHTML);
+                console.log(note_changed);
+                console.log(document.getElementById('noteID').innerHTML)
+                if (note_changed != document.getElementById('noteID').innerHTML) {
+                    note_changed = document.getElementById('noteID').innerHTML;
+                    let index_class = document.getElementById('index').innerHTML;
+                    let middle_class = document.getElementById('middle').innerHTML;
+                    let ring_class = document.getElementById('ring').innerHTML;
+                    let pinky_class = document.getElementById('pinky').innerHTML;
+                    console.log('noticable change');
+                    //console.log(note_changed);
+                    note_positions.push({
+                        'index': index_class == 'correct',
+                        'middle': middle_class == 'correct',
+                        'ring': ring_class == 'correct',
+                        'pinky': pinky_class == 'correct',
+                        'note': note_changed
+                    });
+                    //console.log(note_positions);
+
+
+                    //save classes and note 
+                }
+
+
+
+            });
+
+            // call 'observe' on that MutationObserver instance, 
+            // passing it the element to observe, and the options object
+            observer.observe(elementToObserve, { characterData: true, childList: true, attributes: false });
+
+            $.ajax({
+                url: '/validate_hands',
+                data: {
+                    'right_hand': JSON.stringify(right_hand),
+                },
+                method: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    //console.log(data);
+                    if (data["index"]) {
+                        $('#index').text(data['index']);
+                        $('#ring').text(data['ring']);
+                        $('#middle').text(data['middle']);
+                        $('#pinky').text(data['pinky']);
+                        //console.log(data);
+                        //$('#note').text(data['note']);
+                    }
+                }
+            });
+            for (const landmarks of results.multiHandLandmarks) {
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
+                    { color: '#00FF00', lineWidth: 5 });
+                drawLandmarks(canvasCtx, landmarks, { color: '#FF0000', lineWidth: 2 });
+            }
+        }
+        canvasCtx.restore();
+    }
+    var myPlayer = new kwgVideo('#video-demo');
+
+    const hands = new Hands({
+        locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+        }
+    });
+    hands.setOptions({
+        maxNumHands: 2,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+    });
+    hands.onResults(onResults);
+    camera_stream = null;
+    start_camera.addEventListener('click', async function () {
+        document.getElementById("start-camera").style.display = "none";
+        document.getElementById("start-record").style.display = "";
+        document.getElementById("end-record").style.display = "";
+        document.getElementById("video-demo").style.display = "none";
+        myPlayer.destroy();
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({ image: videoElement });
+            },
+            width: 450,
+            height: 350
+        });
+        camera.start();
+        camera_stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        console.log(camera_stream);
+        video.srcObject = camera_stream;
+    });
+
+    media_recorder = null;
+    start_button.addEventListener('click', function () {
+        var input = this;
+        input.disabled = true;
+        document.getElementById("feedback_table").style.display = "";
+        // set MIME type of recording as video/webm
+        //console.log(camera_stream);
+        media_recorder = new MediaRecorder(camera_stream, { mimeType: "video/webm; codecs=vp8" });
+
+        // event : new recorded video blob available 
+        media_recorder.addEventListener('dataavailable', function (e) {
+            //console.log(blobs_recorded);
+            blobs_recorded.push(e.data);
+        });
+
+        // event : recording stopped & all blobs sent
+        media_recorder.addEventListener('stop', function () {
+            // create local object URL from the recorded video blobs
+            let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: "video/webm; codecs=vp8" }));
+            console.log(video_local);
+            download_link.href = video_local;
+        });
+
+        // start recording with each recorded blob having 1 second video
+        media_recorder.start(1000);
+
+        //start tuner
+        const app = new Application()
+        app.start()
+    });
+
+    stop_button.addEventListener('click', function () {
+        var input = this;
+        input.disabled = true;
+        document.getElementById("start-record").style.display = "none";
+        document.getElementById("end-record").style.display = "none";
+        document.getElementById("feedback_table").style.display = "none";
+        document.getElementById("submit").style.display = "";
+        media_recorder.stop();
+        //onResults.stop();
+
+
+       
+
+    });
+
+    $("#submit").on("click", function (event) {
+        event.preventDefault();
+        let btn = $(this);
+        //   change the button text and disable it
+        btn.html("Submitting...").prop("disabled", true).addClass("disable-btn");
+        //   create a new File with the recordedData and its name
+        const savingblob = new Blob(blobs_recorded, { type: "video/webm; codecs=vp8" });
+        const recordedFile = new File([savingblob], "test.webm", { type: "video/webm; codecs=vp8" });
+        //   initializes an empty FormData
+        let viddata = new FormData();
+        //   appends the recorded file and language value
+        viddata.append("excercise_video", recordedFile);
+        //   post url endpoint
+        const url = "";
+        $.ajax({
+            url: '/record_feedback',
+            method: "POST",
+            data: {
+                'positions': JSON.stringify(note_positions),
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log('success');
+
+            }
+        });
+        
+        $.ajax({
+            url: '/record',
+            method: "POST",
+            data:viddata,
+            dataType: "json",
+            success: function (response) {
+                alert('passed');
+                if (response.success) {
+                    document.getElementById("alert").style.display = "block";
+                    window.location.href = `${response.url}`;
+                } else {
+                    btn.html("Error").prop("disabled", false);
+                }
+            },
+            error: function (error) {
+                console.error(error);
+            },
+            cache: false,
+            processData: false,
+            contentType: false,
+        });
+        
+    });
+
+
+    // using jQuery
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    //Now use it on ajax 
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+</script>
 
 <!--------------------------Contact us section ----------------------------------->
 

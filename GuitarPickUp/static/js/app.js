@@ -70,5 +70,4 @@ Application.prototype.toggleAutoMode = function() {
   this.notes.toggleAutoMode()
 }
 
-const app = new Application()
-app.start()
+

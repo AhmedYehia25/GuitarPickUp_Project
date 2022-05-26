@@ -15,7 +15,7 @@ class Excercise(models.Model):
     played = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return self.title
+        return self.title + self.positions
 
     class Meta:
         ordering =['played']
@@ -25,7 +25,7 @@ class StudentVideo(models.Model):
     Excercise_id = models.ForeignKey(Excercise,on_delete=models.CASCADE,null=True,blank=True)
     feedback_id = models.IntegerField(null=True,blank=True)
     report= models.TextField(null=True,blank=True)
-    video_record = models.FileField(upload_to="records")
+    video_record = models.FileField(null = True,upload_to="records")
     video_Path = models.TextField(null=True,blank=True)
 
     def __str__(self) -> str:
@@ -36,16 +36,18 @@ class StudentVideo(models.Model):
 
 
 class Feedback(models.Model):
-    video_id = models.ForeignKey(StudentVideo,on_delete=models.CASCADE,null=True,blank=True)
+    #video_id = models.ForeignKey(StudentVideo,on_delete=models.CASCADE,null=True,blank=True)
+    video_record = models.FileField(null = True,upload_to="records")
+    
     user_id = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
     feedback = models.TextField(null=True,blank=True)
     report= models.TextField(null=True,blank=True)
 
     def __str__(self) -> str:
-        return self.feedback
+        return str(self.id)
 
     class Meta:
-        ordering =['video_id']
+        ordering =['pk']
 
 class Feedback_details(models.Model):
     feedback_id = models.ForeignKey(Feedback,on_delete=models.CASCADE,null=True,blank=True)
