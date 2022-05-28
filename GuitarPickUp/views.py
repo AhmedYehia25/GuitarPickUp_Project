@@ -138,6 +138,8 @@ def coursePage(request):
 def feedbackpage(request,my_id):
     feedback = Feedback.objects.get(pk = my_id)
     video = StudentVideo.objects.latest('pk').video_record
+    #video = StudentVideo.objects.filter(pk = 41).values('video_record')
+    #video = "records/test_XfJOUhp.webm"
     import pandas as pd
     with open(feedback.feedback) as json_file:
         data = json.load(json_file)
