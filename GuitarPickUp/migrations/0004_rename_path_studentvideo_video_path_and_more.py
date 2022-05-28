@@ -10,11 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RenameField(
-            model_name='studentvideo',
-            old_name='Path',
-            new_name='video_Path',
-        ),
         migrations.AddField(
             model_name='studentvideo',
             name='report',

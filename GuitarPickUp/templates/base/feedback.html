@@ -388,7 +388,7 @@
     </div>
     <script src='https://cdn.plot.ly/plotly-2.12.1.min.js'></script>
     <script>
-        var n = {{n}};
+        var n = {n};
         var note_counts = '{{note_counts}}';
         
         note_counts_dict = JSON.parse(note_counts.replaceAll('&quot', '"').replaceAll(';', ''));
@@ -462,4 +462,3 @@
         </div>
         </div>
     </footer>
-{% endblock %}
