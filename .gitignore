@@ -7,8 +7,7 @@ db.sqlite3
 *.pyc
 __pycache__
 db.sqlite3
-media
-feedbacks
+
 # Backup files # 
 *.bak 
 
