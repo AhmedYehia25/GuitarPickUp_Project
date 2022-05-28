@@ -17,7 +17,18 @@
 
 <!--------------------------Header section ----------------------------------->
 
-<header class="site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
+<!--------------------------Header section ----------------------------------->
+
+<div class="site-mobile-menu site-navbar-target">
+    <div class="site-mobile-menu-header">
+        <div class="site-mobile-menu-close mt-3">
+            <span class="icon-close2 js-menu-toggle"></span>
+        </div>
+    </div>
+    <div class="site-mobile-menu-body"></div>
+</div>
+
+<header class="color site-navbar py-4 js-sticky-header site-navbar-target" role="banner">
 
     <div class="container-fluid">
         <div class="d-flex align-items-center">
@@ -37,9 +48,9 @@
 
             <div class="ml-auto w-25">
                 <nav class="site-navigation position-relative text-right" role="navigation">
-                    <ul class="site-menu main-menu site-menu-dark js-clone-nav mr-auto d-none d-lg-block m-0 p-0">
+                    <ul class="site-menu main-menu js-clone-nav mr-auto d-none d-lg-block m-0 p-0">
                         {% if request.user.is_authenticated%}
-                        <p>Welcome {{request.user}}</p>
+                        <li><a class="nav-link">Welcome {{request.user}}</a></li>
                         <li class="cta"><a href="{% url 'logout' %}" class="nav-link"><span>Logout</span></a></li>
                         {% else %}
                         <li class="cta"><a href="{% url 'login' %}" class="nav-link"><span>Login</span></a></li>
@@ -55,314 +66,285 @@
 
 </header>
 
+<style>
+    .readonly-draft-view .caption-group-preview:nth-child(even) {
+        background-color: #f1f1f1;
+    }
+
+    .new-workspace {
+        background: #f1f1f1;
+        padding: 0;
+        color: dimgray;
+    }
+
+    .new-workspace .section {
+        background: #fff;
+        height: 95%;
+        padding: 20px;
+        margin-top: 20px;
+        margin-bottom: 20px;
+    }
+
+    .new-workspace .section .header {
+        margin-top: 0px;
+    }
+
+    .app h1 {
+        color: #3c3c3c !important;
+        font-family: "Montserrat", "Lucida Grande", "Segoe UI", Verdana, Helvetica, Arial, sans-serif;
+        font-weight: 700 !important;
+        font-size: 18px !important;
+    }
+
+    .new-workspace .section .header:after {
+        display: block;
+        content: "";
+        border-bottom: 1px solid #e2e2e2;
+        padding-top: 10px;
+        margin: 0px -20px;
+        margin-bottom: 20px;
+    }
+
+    .clearfix:before,
+    .clearfix:after {
+        display: table;
+        content: "";
+        line-height: 0;
+    }
+
+    .clearfix:after {
+        clear: both;
+    }
+
+    ul.unstyled,
+    ol.unstyled {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    p,
+    ul,
+    ol {
+        font-family: "Lucida Grande", "Segoe UI", Verdana, Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        color: dimgray;
+        line-height: 20px;
+    }
+
+    .spot-check-clips-list li {
+        float: left;
+        padding: 20px;
+    }
+
+    .new-workspace a:not(.btn) {
+        color: #4289cc;
+    }
+
+    .file-name {
+        clear: both;
+    }
+
+    #captions-spotcheck-container #mediaplayer-buttons-container {
+        display: inline-block;
+        margin-left: -18px;
+    }
+
+    .mejs-offscreen {
+        border: 0;
+        clip: rect(1px, 1px, 1px, 1px);
+        -webkit-clip-path: inset(50%);
+        clip-path: inset(50%);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+        word-wrap: normal;
+    }
+
+    .mejs-container {
+        background: #000;
+        box-sizing: border-box;
+        font-family: 'Helvetica', Arial, sans-serif;
+        position: relative;
+        text-align: left;
+        text-indent: 0;
+        vertical-align: top;
+    }
+
+    .mejs-container * {
+        box-sizing: border-box;
+    }
+
+    .mejs-mediaelement {
+        height: 100%;
+        left: 0;
+        position: absolute;
+        top: 0;
+        width: 100%;
+        z-index: 0;
+    }
+
+    .readonly-draft-view {
+        height: 30vh;
+        padding: 1em 0;
+        margin-top: 1em;
+        overflow-y: scroll;
+    }
+
+    .readonly-draft-view .caption-group-preview {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        padding: 0.25em 0.35em;
+    }
+
+    .readonly-draft-view .caption-group-preview .text {
+        text-align: left;
+        width: 80%;
+    }
+
+    .readonly-draft-view .caption-group-preview .timestamp {
+        text-align: right;
+        margin-left: 1em;
+        font-style: italic;
+        font-size: 0.85em;
+    }
+
+    .app {
+        background-color: #f1f1f1;
+    }
+
+    .container {
+        margin-right: auto;
+        margin-left: auto;
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    .color {
+        background-color: #343a40;
+    }
+
+    .my-custom-scrollbar {
+        position: relative;
+        height: 200px;
+        overflow: auto;
+    }
+
+    .table-wrapper-scroll-y {
+        display: block;
+    }
+</style>
+
+
+
 <!--------------------------Home section ----------------------------------->
 
-<div class="intro-section" id="programs-section">
-    <div class="slide-1" style="background-image: url('static/images/main.jpeg');" data-stellar-background-ratio="0.5">
-        <h1 data-aos="fade-up" data-aos-delay="100" class="text-center" style="position: absolute; text-align: center; width:100%; top:20%">Exercise 1</h1>
+<div class="intro-section" id="programs-section" style="padding-top: 105px;min-height: 720px !important; width:100%; background-color: white; overflow-x: hidden; overflow-y: hidden;">
+    <div class = "app">
+        <div class = "container">
 
-        <div class="container">
+            <div class="new-workspace">
+                <div class="row top20">
+                    <div class="col-xs-8 col-sm-10 col-md-8 col-lg-6" id="captions-spotcheck-column">
+                        <div class="section" id="captions-spotcheck-container">
+                            <h1 class="header">
+                                A minor
+                            </h1>
+                            <div class="clearfix">
+                                <div id="spot-check-container-198565942">
+                                    <h2>Excercise 1 </h2>
+                                    <div class="file-name">fifth position</div>
+                                                    
+                                        <video class="input_video" style="display:none"></video>
+                                        <canvas class="output_canvas" width="500" height="350" style="display:none"></canvas>
+                                    
+                                        <video id="video-demo" width="104%" height="350" controls style="object-fit: fill;">
+                                            <source src="/static/images/video2.mp4" type="video/mp4">
+                                            Your browser does not support HTML5 video.
+                                        </video>
+                                    
+                                </div>
+                            </div>
+                                <div class = "row">
+                                    <div class = "col">
+                                        <div style=" text-align: center; width:100%; bottom:25%; left:-4%"><button id="start-camera"
+                                                class="btn btn-primary py-3 px-5 btn-pill exercise">Open camera</button></div>
+                                    </div>
+                                </div>
+                                <div class ="row">
+                                    <div class = "col">
+                                        <button id="start-record" class="btn btn-primary py-3 px-5 btn-pill exercise"
+                                            style=" text-align: center; width:200px; bottom:25%; left:20%">Start Excercise</button>
+                                    </div>
+                                    <div class = "col">
+                                        <button id="end-record" class="btn btn-primary py-3 px-5 btn-pill exercise"
+                                            style="text-align: center; width:200px; bottom:25%; left:65%">End Excercise</button>
+                                    </div>
+                                </div>
+                                <form method="POST" enctype="multipart/form-data">
+                                    {% csrf_token %}
+                                    <div class ="row">
+                                        <div class = "col">
+                                            <div class="field">
+                                                <div style=" text-align: center; width:100%; bottom:25%"><button id="submit"
+                                                        class="btn btn-primary py-3 px-5 btn-pill exercise">Submit Excercise</button></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
 
-            <div class="row align-items-center">
-                
-                <div class="col-6"><video width="450" height="350" controls style="object-fit: fill;"><source src="/static/images/video1.mp4" type="video/mp4"></video></div>
-                <div class="col-6">
-                    <div class="container">
-                        <video class="input_video" style="display:none"></video>
-                        <canvas class="output_canvas" width="450" height="350"></canvas>
-                      </div>
+                        </div>
+            
+            
+                    </div>
+
+            
+                    <div class="col-xs-8 col-sm-10 col-md-8 col-lg-6" id="captions-scorecard-column">
+                        <div class="section" style="height: 740px !important;overflow-y:auto !important;"
+                            id="captions-scorecard-container">
+                            <h1 class="header">
+                                Instructions & feedback
+                            </h1>
+            
+                            <div class="clearfix">
+                                {% load static %}
+                                <img src = "../static/images/scaleaminor.png" width = "100%" height = "70%">
+                                <div id="feedback_table" style="position: absolute; text-align: center; width:150%;  background-color: white; color: black; width: 300px; height: 240px;">
+                                    Feedback
+                                    <hr>
+                                    <dl>
+                                        <dt>note</dt>
+                                        <!--<dd id="note">asd</dd>-->
+                                        <dd id="noteID">A</dd>
+                                        <dt>Index</dt>
+                                        <dd id="index">0.2</dd>
+                                        <dt>Middle</dt>
+                                        <dd id="middle">0.2</dd>
+                                        <dt>Ring</dt>
+                                        <dd id="ring">0.2</dd>
+                                        <dt>Pinky</dt>
+                                        <dd id="pinky">0.2</dd>
+                                
+                                
+                                
+                                
+                                    </dl>
+                                </div>
+                            </div>
+            
+                        </div>
+                    </div>
                 </div>
-            
-            </div>
-            
-            <script type="module">
-                
-                document.getElementById("start-record").style.display="none";
-                document.getElementById("end-record").style.display="none";
-                document.getElementById("submit").style.display="none";
-                document.getElementById("feedback_table").style.display="none";
-                let video = document.querySelector("#video");
-                let start_camera = document.querySelector("#start-camera");
-                let start_button = document.querySelector("#start-record");
-                let stop_button = document.querySelector("#end-record");
-                let download_link = document.querySelector("#download-video");
-
-                let camera_stream = null;
-                let media_recorder = null;
-                let blobs_recorded = [];
-                
-                const videoElement = document.getElementsByClassName('input_video')[0];
-                const canvasElement = document.getElementsByClassName('output_canvas')[0];
-                const canvasCtx = canvasElement.getContext('2d');
-                var indexFinger = document.getElementById("index");
-                var middleFinger = document.getElementById("middle");
-                var ringFinger = document.getElementById("ring");
-                var pinkyFinger = document.getElementById("pinky");
-                function onResults(results) {
-                  canvasCtx.save();
-                  canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-                  canvasCtx.drawImage(
-                      results.image, 0, 0, canvasElement.width, canvasElement.height);
-                  if (results.multiHandLandmarks) {
-                      var left_hand;
-                      var right_hand;
-                      for (var i = 0; i < 2; i++) {
-                          if (results.multiHandedness[i]) {
-                            if (results.multiHandedness[i]['label'] == "Left") {
-                                left_hand = results.multiHandLandmarks[i];
-                            } else if (results.multiHandedness[i]['label'] == "Right"){
-                                right_hand = results.multiHandLandmarks[i];
-                            }
-                        }
-                      }
-
-                    // identify an element to observe
-                    let elementToObserve = document.getElementById('noteID');
-                    
-                    // create a new instance of 'MutationObserver' named 'observer', 
-                    // passing it a callback function
-                    let note_changed = document.getElementById('noteID').innerHTML;   
-                    let observer = new MutationObserver(function (mutationsList, observer) {
-                        //console.log(mutationsList);
-                        //console.log(note_changed);
-                        //console.log(document.getElementById('noteID').innerHTML)
-                        //console.log(note_changed != document.getElementById('noteID').innerHTML);
-                        if(note_changed != document.getElementById('noteID').innerHTML)
-                        {
-                            note_changed = document.getElementById('noteID').innerHTML;
-                            let index_class = document.getElementById('index').innerHTML;
-                            let middle_class = document.getElementById('middle').innerHTML;
-                            let ring_class = document.getElementById('ring').innerHTML;
-                            let pinky_class = document.getElementById('pinky').innerHTML;
-                            console.log('noticable change');
-                            //console.log(note_changed);
-                            $.ajax({
-                                url: '/record_feedback',
-                                data: {
-                                    'index_class': index_class,
-                                    'middle_class':middle_class,
-                                    'ring_class':ring_class,
-                                    'pinky_class':pinky_class,
-                                    'note_played': note_changed,
-
-                                },
-                                dataType: 'json',
-                                success: function (data) {
-                                    console.log('success');
-
-                                }
-                            });
-                            //save classes and note 
-                        }
-                        
-                        
-                        
-                    });
-
-                    // call 'observe' on that MutationObserver instance, 
-                    // passing it the element to observe, and the options object
-                    observer.observe(elementToObserve, { characterData: true, childList: true, attributes: false });
-
-                    $.ajax({
-                        url: '/validate_hands',
-                        data: {
-                            'right_hand': JSON.stringify(right_hand),
-                        },
-                        dataType: 'json',
-                        success: function (data) {
-                            //console.log(data);
-                            if (data["index"]) {
-                                $('#index').text(data['index']);
-                                $('#ring').text(data['ring']);
-                                $('#middle').text(data['middle']);
-                                $('#pinky').text(data['pinky']);
-                                //console.log(data);
-                                //$('#note').text(data['note']);
-                            }
-                        }
-                    });
-                    for (const landmarks of results.multiHandLandmarks) {
-                      drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
-                                     {color: '#00FF00', lineWidth: 5});
-                      drawLandmarks(canvasCtx, landmarks, {color: '#FF0000', lineWidth: 2});
-                    }
-                  }
-                  canvasCtx.restore();
-                }
-                
-                const hands = new Hands({locateFile: (file) => {
-                  return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
-                }});
-                hands.setOptions({
-                  maxNumHands: 2,
-                  modelComplexity: 1,
-                  minDetectionConfidence: 0.5,
-                  minTrackingConfidence: 0.5
-                });
-                hands.onResults(onResults);
-
-                start_camera.addEventListener('click', async function() {
-                    document.getElementById("start-camera").style.display="none";
-                    document.getElementById("start-record").style.display="";
-                    document.getElementById("end-record").style.display="";
-                    const camera = new Camera(videoElement, {
-                    onFrame: async () => {
-                        await hands.send({image: videoElement});
-                        },
-                        width: 450,
-                        height: 350
-                    });
-                    camera.start();
-                    camera_stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-	                video.srcObject = camera_stream;
-                });
-                
-
-                start_button.addEventListener('click', function() {
-                    var input = this;
-                    input.disabled = true;
-                    document.getElementById("feedback_table").style.display="";
-                // set MIME type of recording as video/webm
-                media_recorder = new MediaRecorder(camera_stream, { mimeType: "video/webm; codecs=vp8" });
-
-                // event : new recorded video blob available 
-                media_recorder.addEventListener('dataavailable', function(e) {
-                    blobs_recorded.push(e.data);
-                });
-
-                // event : recording stopped & all blobs sent
-                media_recorder.addEventListener('stop', function() {
-                    // create local object URL from the recorded video blobs
-                    let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: "video/webm; codecs=vp8" }));
-                    download_link.href = video_local;
-                });
-
-                // start recording with each recorded blob having 1 second video
-                media_recorder.start(1000);
-                });
-
-                stop_button.addEventListener('click', function() {
-                    var input = this;
-                    input.disabled = true;
-                    document.getElementById("start-record").style.display="none";
-                    document.getElementById("end-record").style.display="none";
-                    document.getElementById("feedback_table").style.display="none";
-                    document.getElementById("submit").style.display="";
-                    media_recorder.stop(); 
-                    onResults.stop();
-
-                });
-                
-                $("#submit").on("click", function (event) {
-                    event.preventDefault();
-                    let btn = $(this);
-                    //   change the button text and disable it
-                    btn.html("Submitting...").prop("disabled", true).addClass("disable-btn");
-                    //   create a new File with the recordedData and its name
-                    const savingblob = new Blob(blobs_recorded , {type: "video/webm; codecs=vp8"});
-                    const recordedFile = new File( [ savingblob ], "test.webm", { type: "video/webm; codecs=vp8"} );
-                    //   initializes an empty FormData
-                    let data = new FormData();
-                    //   appends the recorded file and language value
-                    data.append("excercise_video", recordedFile);
-                    //   post url endpoint
-                    const url = "";
-                    $.ajax({
-                        url: '/record',
-                        method: "POST",
-                        data: data,
-                        dataType: "json",
-                        success: function (response) {
-                        if (response.success) {
-                            document.getElementById("alert").style.display = "block";
-                            window.location.href = `${response.url}`;
-                        } else {
-                            btn.html("Error").prop("disabled", false);
-                        }
-                        },
-                        error: function (error) {
-                        console.error(error);
-                        },
-                        cache: false,
-                        processData: false,
-                        contentType: false,
-                    });
-                });
-
-                // using jQuery
-                function getCookie(name) {
-                    var cookieValue = null;
-                    if (document.cookie && document.cookie !== '') {
-                        var cookies = document.cookie.split(';');
-                        for (var i = 0; i < cookies.length; i++) {
-                            var cookie = jQuery.trim(cookies[i]);
-                            // Does this cookie string begin with the name we want?
-                            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                                break;
-                            }
-                        }
-                    }
-                    return cookieValue;
-                }
-                var csrftoken = getCookie('csrftoken');
-
-                //Now use it on ajax 
-                function csrfSafeMethod(method) {
-                    // these HTTP methods do not require CSRF protection
-                    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
-                }
-                $.ajaxSetup({
-                    beforeSend: function(xhr, settings) {
-                        if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
-                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                        }
-                    }
-                });
-                    
-                </script>
-        </div>
-
-        <div style="position:absolute; text-align: center; width:100%; bottom:25%"><button id="start-camera" class="btn btn-primary py-3 px-5 btn-pill exercise">Open camera</button></div>
-        <div class="row">
-            <div class="col-md-3">
-                <div style="position: absolute; text-align: center; width:100%; bottom:25%;margin-bottom: 45%;margin-left: 60%;"><button id="start-record" class="btn btn-primary py-3 px-5 btn-pill exercise">Start Excercise</button></div>
-            </div>
-            <div class="col-md-3">
-                <div style="position: absolute; text-align: center; width:100%; bottom:25%;margin-bottom: 45%;margin-left: 115%;"><button id="end-record" class="btn btn-primary py-3 px-5 btn-pill exercise">End Excercise</button></div>
             </div>
         </div>
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="field">
-                <div style="position:absolute; text-align: center; width:100%; bottom:25%"><button id="submit" class="btn btn-primary py-3 px-5 btn-pill exercise">Submit Excercise</button></div>
-            </div>
-        </form>
-
-        <div id="feedback_table" style="position: absolute; text-align: center; width:100%; bottom:2%; background-color: white; color: black; width: 300px; height: 240px; margin-left: auto; margin-right: auto; left: 0; right: 0;">
-            Feedback
-            <hr>
-            <dl>
-                <dt>note</dt>
-                <!--<dd id="note">asd</dd>-->
-                <dd id="noteID">A</dd>
-                <dt>Index</dt>
-                <dd id="index">0.2</dd>
-                <dt>Middle</dt>
-                <dd id="middle">0.2</dd>
-                <dt>Ring</dt>
-                <dd id="ring">0.2</dd>
-                <dt>Pinky</dt>
-                <dd id="pinky">0.2</dd>
-                
-                
-                
-            
-            </dl>        
-        </div>
-        
 
     </div>
+
+
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9"></script>
 <script src="https://cdn.jsdelivr.net/npm/aubiojs"></script>
@@ -370,6 +352,282 @@
 <script src="/static/js/meter.js"></script>
 <script src="/static/js/notes.js"></script>
 <script src="/static/js/app.js"></script>
+
+<script type="module">
+    var myPlayer = new kwgVideo('#video-demo');
+    document.getElementById("start-record").style.display = "none";
+    document.getElementById("end-record").style.display = "none";
+    document.getElementById("submit").style.display = "none";
+    document.getElementById("feedback_table").style.display = "none";
+    let video = document.querySelector("#video");
+    let start_camera = document.querySelector("#start-camera");
+    let start_button = document.querySelector("#start-record");
+    let stop_button = document.querySelector("#end-record");
+    let download_link = document.querySelector("#download-video");
+
+    let camera_stream = null;
+    let media_recorder = null;
+    let blobs_recorded = [];
+    let note_positions = [];
+    const videoElement = document.getElementsByClassName('input_video')[0];
+    const canvasElement = document.getElementsByClassName('output_canvas')[0];
+    const canvasCtx = canvasElement.getContext('2d');
+    var indexFinger = document.getElementById("index");
+    var middleFinger = document.getElementById("middle");
+    var ringFinger = document.getElementById("ring");
+    var pinkyFinger = document.getElementById("pinky");
+    
+    function onResults(results) {
+        canvasCtx.save();
+        canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        canvasCtx.drawImage(
+            results.image, 0, 0, canvasElement.width, canvasElement.height);
+        if (results.multiHandLandmarks) {
+            var left_hand;
+            var right_hand;
+            for (var i = 0; i < 2; i++) {
+                if (results.multiHandedness[i]) {
+                    if (results.multiHandedness[i]['label'] == "Left") {
+                        left_hand = results.multiHandLandmarks[i];
+                    } else if (results.multiHandedness[i]['label'] == "Right") {
+                        right_hand = results.multiHandLandmarks[i];
+                    }
+                }
+            }
+
+            // identify an element to observe
+            let elementToObserve = document.getElementById('noteID');
+
+            // create a new instance of 'MutationObserver' named 'observer', 
+            // passing it a callback function
+            let note_changed = document.getElementById('noteID').innerHTML;
+            let observer = new MutationObserver(function (mutationsList, observer) {
+                //console.log(mutationsList);
+                //console.log(note_changed);
+                //console.log(document.getElementById('noteID').innerHTML)
+                //console.log(note_changed != document.getElementById('noteID').innerHTML);
+                console.log(note_changed);
+                console.log(document.getElementById('noteID').innerHTML)
+                if (note_changed != document.getElementById('noteID').innerHTML) {
+                    note_changed = document.getElementById('noteID').innerHTML;
+                    let index_class = document.getElementById('index').innerHTML;
+                    let middle_class = document.getElementById('middle').innerHTML;
+                    let ring_class = document.getElementById('ring').innerHTML;
+                    let pinky_class = document.getElementById('pinky').innerHTML;
+                    console.log('noticable change');
+                    //console.log(note_changed);
+                    note_positions.push({
+                        'index': index_class == 'correct',
+                        'middle': middle_class == 'correct',
+                        'ring': ring_class == 'correct',
+                        'pinky': pinky_class == 'correct',
+                        'note': note_changed
+                    });
+                    //console.log(note_positions);
+
+
+                    //save classes and note 
+                }
+
+
+
+            });
+
+            // call 'observe' on that MutationObserver instance, 
+            // passing it the element to observe, and the options object
+            observer.observe(elementToObserve, { characterData: true, childList: true, attributes: false });
+
+            $.ajax({
+                url: '/validate_hands',
+                data: {
+                    'right_hand': JSON.stringify(right_hand),
+                },
+                method: 'POST',
+                dataType: 'json',
+                success: function (data) {
+                    //console.log(data);
+                    if (data["index"]) {
+                        $('#index').text(data['index']);
+                        $('#ring').text(data['ring']);
+                        $('#middle').text(data['middle']);
+                        $('#pinky').text(data['pinky']);
+                        //console.log(data);
+                        //$('#note').text(data['note']);
+                    }
+                }
+            });
+            for (const landmarks of results.multiHandLandmarks) {
+                drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS,
+                    { color: '#00FF00', lineWidth: 5 });
+                drawLandmarks(canvasCtx, landmarks, { color: '#FF0000', lineWidth: 2 });
+            }
+        }
+        canvasCtx.restore();
+    }
+    
+
+    const hands = new Hands({
+        locateFile: (file) => {
+            return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+        }
+    });
+    hands.setOptions({
+        maxNumHands: 2,
+        modelComplexity: 1,
+        minDetectionConfidence: 0.5,
+        minTrackingConfidence: 0.5
+    });
+    hands.onResults(onResults);
+    camera_stream = null;
+    start_camera.addEventListener('click', async function () {
+        document.getElementById("start-camera").style.display = "none";
+        document.getElementById("start-record").style.display = "";
+        document.getElementById("end-record").style.display = "";
+        document.getElementById("video-demo").style.display = "none";
+        myPlayer.destroy();
+        canvasElement.style.display = "";
+        const camera = new Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({ image: videoElement });
+            },
+            width: 450,
+            height: 350
+        });
+        camera.start();
+        camera_stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        console.log(camera_stream);
+        video.srcObject = camera_stream;
+    });
+
+    media_recorder = null;
+    start_button.addEventListener('click', function () {
+        var input = this;
+        input.disabled = true;
+        document.getElementById("feedback_table").style.display = "";
+        // set MIME type of recording as video/webm
+        //console.log(camera_stream);
+        media_recorder = new MediaRecorder(camera_stream, { mimeType: "video/webm; codecs=vp8" });
+
+        // event : new recorded video blob available 
+        media_recorder.addEventListener('dataavailable', function (e) {
+            //console.log(blobs_recorded);
+            blobs_recorded.push(e.data);
+        });
+
+        // event : recording stopped & all blobs sent
+        media_recorder.addEventListener('stop', function () {
+            // create local object URL from the recorded video blobs
+            let video_local = URL.createObjectURL(new Blob(blobs_recorded, { type: "video/webm; codecs=vp8" }));
+            console.log(video_local);
+            download_link.href = video_local;
+        });
+
+        // start recording with each recorded blob having 1 second video
+        media_recorder.start(1000);
+
+        //start tuner
+        const app = new Application()
+        app.start()
+    });
+
+    stop_button.addEventListener('click', function () {
+        var input = this;
+        input.disabled = true;
+        document.getElementById("start-record").style.display = "none";
+        document.getElementById("end-record").style.display = "none";
+        document.getElementById("feedback_table").style.display = "none";
+        document.getElementById("submit").style.display = "";
+        media_recorder.stop();
+        //onResults.stop();
+
+
+       
+
+    });
+
+    $("#submit").on("click", function (event) {
+        event.preventDefault();
+        let btn = $(this);
+        //   change the button text and disable it
+        btn.html("Submitting...").prop("disabled", true).addClass("disable-btn");
+        //   create a new File with the recordedData and its name
+        const savingblob = new Blob(blobs_recorded, { type: "video/webm; codecs=vp8" });
+        const recordedFile = new File([savingblob], "test.webm", { type: "video/webm; codecs=vp8" });
+        //   initializes an empty FormData
+        let viddata = new FormData();
+        //   appends the recorded file and language value
+        viddata.append("excercise_video", recordedFile);
+        //   post url endpoint
+        const url = "";
+        $.ajax({
+            url: '/record_feedback',
+            method: "POST",
+            data: {
+                'positions': JSON.stringify(note_positions),
+            },
+            dataType: 'json',
+            success: function (data) {
+                console.log('success');
+
+            }
+        });
+        
+        $.ajax({
+            url: '/record',
+            method: "POST",
+            data:viddata,
+            dataType: "json",
+            success: function (response) {
+                alert('passed');
+                if (response.success) {
+                    document.getElementById("alert").style.display = "block";
+                    window.location.href = `${response.url}`;
+                } else {
+                    btn.html("Error").prop("disabled", false);
+                }
+            },
+            error: function (error) {
+                console.error(error);
+            },
+            cache: false,
+            processData: false,
+            contentType: false,
+        });
+        
+    });
+
+
+    // using jQuery
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    //Now use it on ajax 
+    function csrfSafeMethod(method) {
+        // these HTTP methods do not require CSRF protection
+        return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+    }
+    $.ajaxSetup({
+        beforeSend: function (xhr, settings) {
+            if (!csrfSafeMethod(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+            }
+        }
+    });
+</script>
 
 <!--------------------------Contact us section ----------------------------------->
 

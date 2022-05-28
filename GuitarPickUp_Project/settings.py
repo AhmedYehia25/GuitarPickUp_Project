@@ -131,10 +131,10 @@ LOGIN_URL = 'login'
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = '/static/'
-
+FEEDBACK_URL = "feedbacks/"
 if DEBUG:
-    MEDIA_URL = "/media/"
-    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_URL = "media/records/"
+    MEDIA_ROOT = BASE_DIR / "media/records"
 else:
     MEDIA_URL = "/media/"
 

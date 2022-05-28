@@ -162,11 +162,21 @@
     .color{
         background-color: #343a40;
     }
+
+    .my-custom-scrollbar {
+    position: relative;
+    height: 200px;
+    overflow: auto;
+    }
+    .table-wrapper-scroll-y {
+    display: block;
+    }
 </style>
 {% endblock %}
 
 {% block body %}
 <!--------------------------Header section ----------------------------------->
+
     <div class="site-mobile-menu site-navbar-target">
         <div class="site-mobile-menu-header">
             <div class="site-mobile-menu-close mt-3">
@@ -227,14 +237,14 @@
                                 </h1>
                                 <div class="clearfix">
                                     <div id="spot-check-container-198565942">
-                                        <h2>Excercise 1 - my video</h2>
+                                        <h2>Excercise 1 - my video </h2>
                                         <div class="file-name">Description of video</div>
                                         <div id="mediaplayer-buttons-container">
-                                            <video width="104%" height="350" controls style="object-fit: fill;"><source src="/static/images/video.mp4" type="video/mp4"></video>
+                                            <video preload="auto" autoplay loop muted width="104%" height="350" controls style="object-fit: fill;"><source src="/media/records/records/IMG_4480.MOV" type="video/webm"></video>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="readonly-draft-view">
+                                <!--<div class="readonly-draft-view">
                                     <div class="caption-group-preview">
                                         <div class="text">Feedback 1.</div>
                                         <span class="timestamp">00:00:00</span>
@@ -279,17 +289,64 @@
                                         <div class="text">Feedback 11.</div>
                                         <span class="timestamp">00:00:15</span>
                                     </div>
+                                </div>-->
+                                <div class="table-wrapper-scroll-y my-custom-scrollbar">
+
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">note</th>
+                                            <th scope="col">index</th>
+                                            <th scope="col">middle</th>
+                                            <th scope="col">ring</th>
+                                            <th scope="col">pinky</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for row in table%}
+                                        
+                                    
+                                        <tr>
+                                            <th scope="row">{{row.note}}</th>
+                                            <td>{{row.index}}</td>
+                                            <td>{{row.middle}}</td>
+                                            <td>{{row.ring}}</td>
+                                            <td>{{row.pinky}}</td>
+                                        </tr>
+                                    {% endfor %}
+                                        
+                                        
+                                    </tbody>
+                                </table>
                                 </div>
                             </div>
+
+                            
                         </div>
+                        
                         <div class="col-xs-8 col-sm-10 col-md-8 col-lg-6" id="captions-scorecard-column">
-                            <div class="section" style="height: auto !important;" id="captions-scorecard-container">
+                            <div class="section" style="height: 740px !important;overflow-y:auto !important;" id="captions-scorecard-container">
                                 <h1 class="header">
                                     Caption Feedback
                                 </h1>
+                                
                                 <div class="clearfix">
-    
+                                    
                                     <h4>Feedback</h4>
+                                    <h5>Notes Played</h5>
+                                    <div id='notesplot'>
+                                        <!-- Plotly chart will be drawn inside this DIV -->
+                                    </div>
+                                    
+
+
+                                    <h5>correct and incorrect positions</h5>
+                                    <div id='fingerBarPlot'>
+                                        <!-- Plotly chart will be drawn inside this DIV -->
+                                    </div>
+                                    
+                                    
+                                    <!--
                                     <h5>What you did well:</h5>
                                     <p>
                                         Good job with accuracy and alignment.
@@ -301,22 +358,22 @@
                                     </p>
     
                                     <br>
-    
+                                    -->
                                 </div>
     
                                 <br>
-    
+                                <!--
                                 <a id="back-to-project" href="/workspace/project/CP0157511228P-1"
                                     class="btn btn-tiny windows">« Back to
                                     the my past projects</a>
                                 <a id="finish-review"
                                     href="/Workspace/CompleteGradeReview/CP0157511228P-1?projectFlags=None"
                                     class="btn btn-tiny windows">Play again</a>
-    
+                                
                                 <button
                                     style="background-color: red;color: white;border-color: white;margin-left: 216px;">Download
-                                    feedback</button>
-    
+                                    feedback</button>-->
+                                
                                 <script>
                                     $(function () {
                                         $('.glyphicon-info-sign').tooltip({ content: 'body' });
@@ -329,6 +386,65 @@
             </div>
         </div>
     </div>
+    <script src='https://cdn.plot.ly/plotly-2.12.1.min.js'></script>
+    <script>
+        var n = {{n}};
+        var note_counts = '{{note_counts}}';
+        
+        note_counts_dict = JSON.parse(note_counts.replaceAll('&quot', '"').replaceAll(';', ''));
+        A_minor = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
+
+        keys = Object.keys(note_counts_dict);
+        includes = keys.map(function(item,index){
+            return A_minor.includes(item) ? 'in tune':'out of tune';
+        });
+
+        notes_in_scale = includes.filter(x=> x== 'in tune').length;  
+        values = Object.values(note_counts_dict);
+        var note_trace = {
+            x:keys,
+            y:values,
+            name:'notes played',
+            type:'bar',
+            text:includes,
+        }
+
+        var data = [ note_trace];
+        title = `${notes_in_scale} notes played in scale`;
+
+        var layout = { title:title,barmode: 'stack' };
+
+        Plotly.newPlot('notesplot', data, layout);
+
+
+        var counts = '{{counts}}';
+        counts_dict_correct = JSON.parse(counts.replaceAll('&quot','"').replaceAll(';',''))
+        counts_incorrect = Object.values(counts_dict_correct).map(function(item,index){
+            return n - item
+        });
+        
+        var trace1 = {
+            x: ['index', 'middle', 'ring','pinky'],
+            y: counts_incorrect,
+            name: 'incorrect',
+            type: 'bar'
+        };
+
+        var trace2 = {
+            x: ['index', 'middle', 'ring','pinky'],
+            y: Object.values(counts_dict_correct),
+            name: 'correct',
+            type: 'bar'
+        };
+
+        var data = [trace1, trace2];
+
+        var layout = { barmode: 'group' };
+
+        Plotly.newPlot('fingerBarPlot', data, layout);
+
+
+    </script>
 
     <!--------------------------Footer section ----------------------------------->
 

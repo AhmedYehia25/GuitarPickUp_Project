@@ -20,7 +20,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView,UpdateView,DeleteView,FormView
 from django.urls import reverse_lazy
 from django.contrib import messages
-from .tuner_hps import *
+#from .tuner_hps import *
 from django.contrib.auth.views import LoginView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.forms import UserCreationForm
@@ -39,6 +39,8 @@ import numpy as np
 import threading
 from django.http import JsonResponse
 
+from django.conf import settings 
+
 def home(request):
     if (request.method == 'POST'):
         username = request.POST.get('username')
@@ -46,8 +48,15 @@ def home(request):
         password = request.POST.get('password1')
         user = User.objects.create_user(username, email, password)
         user.save()
-        
-    return render(request, 'base/home.html')
+    
+    exercises = Excercise.objects.values('id','title','positions')
+    feedback = None
+    if(request.user.id != None):
+        feedback = Feedback.objects.filter(user_id = request.user.id).values('id','feedback')#user_id = request.user.id
+    
+    #print(feedback.values())
+    #print(exercises)
+    return render(request, 'base/home.html',{'exercises':exercises,'feedbacks':feedback})
 
 class CustomLoginView(LoginView):
     template_name = 'base/login.html'
@@ -120,12 +129,38 @@ def coursePage(request):
     #t1 = threading.Thread(target=sound)
     #t1.start()
     #print(request.user.id)
-    feedback = Feedback(feedback = "test" , report = "test",user_id = request.user)
-    feedback.save()
+    #feedback = Feedback(feedback = "test" , report = "test",user_id = request.user)
+    #feedback.save()
+    
+    
     return render(request, 'base/try_excercise.html')
 
-def feedbackpage(request):
-    return render(request, 'base/feedback.html')
+def feedbackpage(request,my_id):
+    feedback = Feedback.objects.get(pk = my_id)
+    video = StudentVideo.objects.latest('pk').video_record
+    #video = StudentVideo.objects.filter(pk = 41).values('video_record')
+    #video = "records/test_XfJOUhp.webm"
+    import pandas as pd
+    with open(feedback.feedback) as json_file:
+        data = json.load(json_file)
+        df = pd.read_json(data)
+    #df_notes_records = df.groupby('note').sum()
+    df_meaningful = df.copy()
+    df_meaningful['index'] = df['index'].replace(True,'correct').replace(False,'incorrect')
+    df_meaningful['middle'] = df['middle'].replace(True,'correct').replace(False,'incorrect')
+    df_meaningful['ring'] = df['ring'].replace(True,'correct').replace(False,'incorrect')
+    df_meaningful['pinky'] = df['pinky'].replace(True,'correct').replace(False,'incorrect')
+    table_dict = list(json.loads(df_meaningful.to_json(orient = 'index')).values())
+    counts_dict = df.loc[:,'index':'pinky'].sum().to_json()
+    note_counts = df['note'].value_counts().to_json()
+    #print(table_dict)
+    return render(request, 'base/feedback.html',{'feedback':feedback,
+    'table':table_dict,
+    'counts':counts_dict,
+    'n':df.shape[0],
+    'note_counts':note_counts,
+    'video':video
+    })
 
 def pyscripttest(request):
     return render(request, 'base/testpyscript.html')
@@ -146,9 +181,58 @@ middle_model = joblib.load("GuitarPickUp/models/classifier_middle.pkl")
 ring_model = joblib.load("GuitarPickUp/models/classifier_ring.pkl")
 pinky_model = joblib.load("GuitarPickUp/models/classifier_pinky.pkl")
 
+
+class validate_hands2(generics.GenericAPIView):
+
+    def post(self, request, *args, **kwargs):
+        left_hand = request.POST.get('left_hand', None)
+        right_hand = request.POST.get('right_hand', None)
+        data = {}
+        if (right_hand):
+            right_decoded = json.loads(right_hand)
+            index_left_coor = np.array([right_decoded[5]['x'],right_decoded[5]['y'],right_decoded[5]['z'],
+                right_decoded[6]['x'],right_decoded[6]['y'],right_decoded[6]['z'],
+                right_decoded[7]['x'],right_decoded[7]['y'],right_decoded[7]['z'],
+                right_decoded[8]['x'],right_decoded[8]['y'],right_decoded[8]['z']])
+            index_left_coor = index_left_coor.reshape(1,12)
+            middle_left_coor = np.array([right_decoded[9]['x'],right_decoded[9]['y'],right_decoded[9]['z'],
+                right_decoded[10]['x'],right_decoded[10]['y'],right_decoded[10]['z'],
+                right_decoded[11]['x'],right_decoded[11]['y'],right_decoded[11]['z'],
+                right_decoded[12]['x'],right_decoded[12]['y'],right_decoded[12]['z']])
+            middle_left_coor = middle_left_coor.reshape(1,12)
+
+            ring_left_coor = np.array([right_decoded[13]['x'],right_decoded[13]['y'],right_decoded[13]['z'],
+                right_decoded[14]['x'],right_decoded[14]['y'],right_decoded[14]['z'],
+                right_decoded[15]['x'],right_decoded[15]['y'],right_decoded[15]['z'],
+                right_decoded[16]['x'],right_decoded[16]['y'],right_decoded[16]['z']])
+            ring_left_coor = ring_left_coor.reshape(1,12)
+                        
+            pinky_left_coor = np.array([right_decoded[17]['x'],right_decoded[17]['y'],right_decoded[17]['z'],
+                right_decoded[18]['x'],right_decoded[18]['y'],right_decoded[18]['z'],
+                right_decoded[19]['x'],right_decoded[19]['y'],right_decoded[19]['z'],
+                right_decoded[20]['x'],right_decoded[20]['y'],right_decoded[20]['z']])
+            pinky_left_coor = pinky_left_coor.reshape(1,12)
+                        
+                        
+            #print(index_left_coor)
+            index_prediction = index_model.predict(index_left_coor)[0]
+            middle_prediction = middle_model.predict(middle_left_coor)[0]
+            ring_prediction = ring_model.predict(ring_left_coor)[0]
+            pinky_prediction = pinky_model.predict(pinky_left_coor)[0]
+            #info = getInfo()
+            data = {
+                'index': index_prediction,
+                'middle': middle_prediction,
+                'ring': ring_prediction,
+                'pinky': pinky_prediction,
+                'note': 'info',
+            }
+
+
+
 def validate_hands(request):
-    left_hand = request.GET.get('left_hand', None)
-    right_hand = request.GET.get('right_hand', None)
+    left_hand = request.POST.get('left_hand', None)
+    right_hand = request.POST.get('right_hand', None)
     data = {}
     if (right_hand):
         right_decoded = json.loads(right_hand)
@@ -176,23 +260,24 @@ def validate_hands(request):
         pinky_left_coor = pinky_left_coor.reshape(1,12)
                     
                     
-        print(index_left_coor)
+        #print(index_left_coor)
         index_prediction = index_model.predict(index_left_coor)[0]
         middle_prediction = middle_model.predict(middle_left_coor)[0]
         ring_prediction = ring_model.predict(ring_left_coor)[0]
         pinky_prediction = pinky_model.predict(pinky_left_coor)[0]
-        info = getInfo()
+        
         data = {
             'index': index_prediction,
             'middle': middle_prediction,
             'ring': ring_prediction,
             'pinky': pinky_prediction,
-            'note': info,
+            'note': 'info',
         }
     return JsonResponse(data)
 
 
 def record_feedback(request):
+    '''
     index_class = request.GET.get('index_class')
     middle_class = request.GET.get('middle_class')
     ring_class = request.GET.get('middle_class')
@@ -202,7 +287,10 @@ def record_feedback(request):
     middle_bool = middle_class == 'correct'
     ring_bool = ring_class == 'correct'
     pinky_bool = pinky_class == 'correct'
-
+    '''
+    #feedback = Feedback(feedback = "test" , report = "test",user_id = request.user)
+    #feedback.save()
+    '''
     last_feedback_id = Feedback.objects.latest('id')
     feedback_details = Feedback_details(feedback_id = last_feedback_id,index_class = index_bool,
                             middle_class = middle_bool,
@@ -210,6 +298,25 @@ def record_feedback(request):
                              pinky_class = pinky_bool,
                              note_played = note_played)
     feedback_details.save()
+    '''
+    feedback_root = settings.FEEDBACK_URL
+    try:
+        last_feedback_id = str(int(str(Feedback.objects.latest('id'))) + 1)
+    except:
+        last_feedback_id = 1
+    full_path = feedback_root + str(last_feedback_id)
+    feedback = Feedback(feedback = full_path , report = "test",user_id = request.user)
+    feedback.save()
+    
+    #last_feedback_id = str(Feedback.objects.latest('id'))
+
+    positions = request.POST.get('positions')
+    #replace sharps with just a hash
+    positions = positions.replace('\u266f', '#')
+    with open(f'{feedback_root}{last_feedback_id}','w') as f:
+        json.dump(positions,f)
+    messages.success(request, "feedback saved!")
+    
     return JsonResponse({'ok':1})
 
 
@@ -429,13 +536,23 @@ class handDetector():
     
 def record(request):
     if request.method == "POST":
+        
         video_file = request.FILES.get("excercise_video")
+        print('video file',video_file)
+        
+        last_feedback_id = Feedback.objects.latest('id').id + 1
+        
+        Feedback.objects.filter(pk = last_feedback_id).update(video_record = video_file)
+
         record = StudentVideo.objects.create(video_record=video_file)
         record.save()
+        
         messages.success(request, "Video successfully added!")
+        
         return JsonResponse(
             {
                 "success": True,
             }
         )
-    return render(request, "base/try_excercise.html")
+        
+    return render(request, "base/home.html")
